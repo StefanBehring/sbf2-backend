@@ -1,0 +1,8 @@
+### GET
+GET http://localhost:4000/api/aktien
+
+### GET aktie by id
+GET http://localhost:4000/api/aktien/628bc465e75a101084c99a2f
+
+### GET aktie by isin
+GET http://localhost:4000/api/aktien/isin/DE0007446007

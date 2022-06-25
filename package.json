@@ -1,0 +1,31 @@
+{
+  "name": "simple-backend-ts",
+  "version": "1.0.0",
+  "description": "simple backend ts",
+  "main": "index.js",
+  "scripts": {
+    "start": "nodemon dist/index.js",
+    "dev:server": "nodemon dist/index.js",
+    "tsc:watch": "tsc -w"
+  },
+  "author": "Stefan Behring",
+  "license": "ISC",
+  "dependencies": {
+    "@types/bcryptjs": "^2.4.2",
+    "axios": "^0.24.0",
+    "bcryptjs": "^2.4.3",
+    "dotenv": "^10.0.0",
+    "express": "^4.17.2",
+    "jsonwebtoken": "^8.5.1",
+    "mongodb": "^4.2.2",
+    "mongoose": "^6.1.2",
+    "morgan": "^1.10.0"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.13",
+    "@types/jsonwebtoken": "^8.5.6",
+    "@types/morgan": "^1.9.3",
+    "@types/node": "^17.0.2",
+    "nodemon": "^2.0.15"
+  }
+}

@@ -1,0 +1,2 @@
+### GET historisch by aktieId
+GET http://localhost:4000/api/historisch/628bc46ce75a101084c99c1d

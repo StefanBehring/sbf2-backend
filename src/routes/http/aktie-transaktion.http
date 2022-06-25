@@ -1,0 +1,19 @@
+### GET all aktie-transaktionen
+GET http://localhost:4000/api/aktie-transaktion
+
+### GET aktie-transaktionen by aktieId
+GET http://localhost:4000/api/aktie-transaktion/628bc465e75a101084c99a35
+
+### POST aktie-transaktion
+POST http://localhost:4000/api/aktie-transaktion
+Content-Type: application/json
+
+{
+    "aktieId": "628bc465e75a101084c99a35",
+    "anzahl": 3, 
+    "preis": 215.1, 
+    "datum": "04.05.2022", 
+    "istKauf": true
+}
+
+

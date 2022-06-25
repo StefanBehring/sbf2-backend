@@ -1,0 +1,5 @@
+### GET current dividends rate
+GET http://localhost:4000/api/lists/current-dividends-rate
+
+### GET last 10 years dividends rate
+GET http://localhost:4000/api/lists/last-10-years-dividends-rate

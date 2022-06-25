@@ -1,0 +1,23 @@
+### POST
+POST http://localhost:4000/api/user
+Content-Type: application/json
+
+{
+    "username": "JohnDoe4",
+    "email": "johndoe4@mail.com",
+    "password": "notencrypted"
+}
+
+### GET
+GET http://localhost:4000/api/user/61c1ba117aba70a982a685d6
+
+### PATCH password
+PATCH http://localhost:4000/api/user/61c1b547c1637e04ec4173e
+Content-Type: application/json
+
+{
+    "password": "stillnotencrypted"
+}
+
+### DELETE
+DELETE  http://localhost:4000/api/user/61c1b547c1637e04ec4173ee
