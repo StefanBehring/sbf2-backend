@@ -1,5 +1,17 @@
+@apiPoint = http://localhost:4000/api/lists
+@aktieId = 62b717d4bb610b2b84cef069
+
 ### GET current dividends rate
-GET http://localhost:4000/api/lists/current-dividends-rate
+GET {{apiPoint}}/current-dividends-rate
+
+### GET current dividends rate aktie
+GET {{apiPoint}}/current-dividends-rate-aktie/{{aktieId}}
+
+### GET constant dividenden rises
+GET {{apiPoint}}/constant-dividenden-rises
 
 ### GET last 10 years dividends rate
-GET http://localhost:4000/api/lists/last-10-years-dividends-rate
+GET {{apiPoint}}/last-10-years-dividends-rate
+
+### GET last 10 years dividends rate aktie
+GET {{apiPoint}}/last-10-years-dividends-rate-aktie/{{aktieId}}

@@ -1,8 +1,12 @@
+@apiPoint = http://localhost:4000/api/aktien
+@aktieId = 62b717cebb610b2b84ceeef1
+@isin = DE000STRA555
+
 ### GET
-GET http://localhost:4000/api/aktien
+GET {{apiPoint}}
 
 ### GET aktie by id
-GET http://localhost:4000/api/aktien/628bc465e75a101084c99a2f
+GET {{apiPoint}}/{{aktieId}}
 
 ### GET aktie by isin
-GET http://localhost:4000/api/aktien/isin/DE0007446007
+GET {{apiPoint}}/isin/{{isin}}
