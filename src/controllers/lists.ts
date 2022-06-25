@@ -12,6 +12,16 @@ type CurrentDividendRate = {
   rate: number
 }
 
+type DividendeRise = {
+  unternehmen: string
+  isin: string
+  dividenden: {
+    jahr: number
+    dividende: number
+  }[]
+  isRiser: boolean
+}
+
 function compare(a: CurrentDividendRate, b: CurrentDividendRate) {
   if (a.rate < b.rate) {
     return 1
@@ -20,6 +30,16 @@ function compare(a: CurrentDividendRate, b: CurrentDividendRate) {
     return -1
   }
   // a muss gleich b sein
+  return 0
+}
+
+function compareRiser(a: DividendeRise, b: DividendeRise) {
+  if (a.isRiser && !b.isRiser) {
+    return -1
+  }
+  if (!a.isRiser && b.isRiser) {
+    return 1
+  }
   return 0
 }
 
@@ -56,8 +76,16 @@ export const getCurrentDividendsRate: RequestHandler = async (
         dividende: 0,
         rate: 0,
       }
+      /*
       let ausgangsdatum = new Date()
       ausgangsdatum.setDate(ausgangsdatum.getDate() - 1)
+
+      if (ausgangsdatum.getDay() === 0) {
+        ausgangsdatum.setDate(ausgangsdatum.getDate() - 2)
+      } else if (ausgangsdatum.getDay() === 6) {
+        ausgangsdatum.setDate(ausgangsdatum.getDate() - 1)
+      }
+
       let checkDay: number | string = ausgangsdatum.getDate()
       let checkMonth: number | string = ausgangsdatum.getMonth() + 1
       let checkYear = ausgangsdatum.getFullYear()
@@ -71,11 +99,14 @@ export const getCurrentDividendsRate: RequestHandler = async (
         checkMonth = `0${checkMonth}`
       }
       const checkDate = `${checkDay}.${checkMonth}.${checkYear}`
+      */
 
       const historisch = await Historisch.findOne({
         aktieId: aktie.id,
-        datum: checkDate,
+        //datum: checkDate,
       })
+        .sort({ datum: 'desc' })
+        .limit(1)
       if (historisch) {
         newEntry.wert = historisch.ende
       } else {
@@ -99,6 +130,135 @@ export const getCurrentDividendsRate: RequestHandler = async (
     }
 
     listData.sort(compare)
+
+    res.status(200).json({
+      listData,
+    })
+  } catch (error) {
+    serverError(error, next)
+  }
+}
+
+export const getCurrentDividendsRateAktie: RequestHandler = async (
+  req,
+  res,
+  next
+) => {
+  const { aktieId } = req.params
+
+  try {
+    const aktie = await Aktien.findById(aktieId)
+
+    if (!aktie) {
+      console.error('Aktie does not exist')
+      return next({ status: 404, message: 'Aktie does not exist' })
+    }
+
+    const newEntry: CurrentDividendRate = {
+      unternehmen: aktie.unternehmen,
+      isin: aktie.isin,
+      wert: 0,
+      dividende: 0,
+      rate: 0,
+    }
+
+    const historisch = await Historisch.findOne({
+      aktieId: aktie.id,
+      //datum: checkDate,
+    })
+      .sort({ datum: 'desc' })
+      .limit(1)
+    if (historisch) {
+      newEntry.wert = historisch.ende
+    } else {
+      console.warn('missing historisch for ' + aktie.unternehmen)
+    }
+
+    const dividenden = await Dividenden.find({ aktieId: aktie.id })
+      .sort({
+        jahr: -1,
+      })
+      .limit(1)
+    if (dividenden.length > 0) {
+      newEntry.dividende = dividenden[0].wert
+      newEntry.rate = newEntry.dividende / newEntry.wert
+    } else {
+      console.warn('Missing dividends for ' + aktie.unternehmen)
+    }
+
+    res.status(200).json({
+      newEntry,
+    })
+  } catch (error) {
+    serverError(error, next)
+  }
+}
+
+export const getConstantDividendRises: RequestHandler = async (
+  req,
+  res,
+  next
+) => {
+  console.log('(getConstantDividendRises) running')
+  try {
+    const aktien = await Aktien.find()
+
+    if (!aktien) {
+      console.error('Aktien do not exist')
+      return next({ status: 404, message: 'Aktien do not exist' })
+    }
+
+    const listData: DividendeRise[] = []
+
+    for (const aktie of aktien) {
+      const newEntry: DividendeRise = {
+        unternehmen: aktie.unternehmen,
+        isin: aktie.isin,
+        dividenden: [],
+        isRiser: false,
+      }
+
+      const dividenden: {
+        _id: string
+        aktieId: string
+        wert: number
+        waehrung: string
+        jahr: number
+        __v: number
+      }[] = await Dividenden.find({ aktieId: aktie.id })
+        .sort({ jahr: -1 })
+        .limit(10)
+
+      if (dividenden.length === 10) {
+        newEntry.dividenden = dividenden.map(el => {
+          return {
+            jahr: el.jahr,
+            dividende: el.wert,
+          }
+        })
+
+        let isRiser = true
+
+        for (let i = 0; i < newEntry.dividenden.length - 1; i++) {
+          if (
+            newEntry.dividenden[i].dividende <=
+              newEntry.dividenden[i + 1].dividende ||
+            newEntry.dividenden[i].dividende <= 0
+          ) {
+            isRiser = false
+            break
+          }
+        }
+
+        newEntry.isRiser = isRiser
+      }
+
+      if (newEntry.isRiser) {
+        listData.push(newEntry)
+      }
+    }
+
+    listData.sort(compareRiser)
 
     res.status(200).json({
       listData,
@@ -132,6 +292,7 @@ export const getLast10YearsDividendsRate: RequestHandler = async (
         dividende: 0,
         rate: 0,
       }
+      /*
       let ausgangsdatum = new Date()
       ausgangsdatum.setDate(ausgangsdatum.getDate() - 1)
       let checkDay: number | string = ausgangsdatum.getDate()
@@ -147,17 +308,19 @@ export const getLast10YearsDividendsRate: RequestHandler = async (
         checkMonth = `0${checkMonth}`
       }
       const checkDate = `${checkDay}.${checkMonth}.${checkYear}`
+      */
 
-      /*const historisch = await Historisch.findOne({
+      const historisch = await Historisch.findOne({
         aktieId: aktie.id,
-        datum: checkDate,
+        //datum: checkDate,
       })
+        .sort({ datum: 'desc' })
+        .limit(1)
       if (historisch) {
         newEntry.wert = historisch.ende
       } else {
         console.warn('missing historisch for ' + aktie.unternehmen)
       }
-      */
 
       const dividenden = await Dividenden.find({ aktieId: aktie.id })
         .sort({
@@ -174,17 +337,77 @@ export const getLast10YearsDividendsRate: RequestHandler = async (
         if (newEntry.wert > 0) {
           listData.push(newEntry)
         } else {
-          listData.push(newEntry)
+          console.log('Did not add to listData')
         }
       } else {
         console.warn('Missing dividends for ' + aktie.unternehmen)
       }
     }
 
-    listData.sort(compareDividende)
+    listData.sort(compare)
 
     res.status(200).json({
       listData,
+    })
+  } catch (error) {
+    serverError(error, next)
+  }
+}
+
+export const getLast10YearsDividendsRateAktie: RequestHandler = async (
+  req,
+  res,
+  next
+) => {
+  console.log('(getLast10YearsDividendsRate) running')
+  try {
+    const { aktieId } = req.params
+
+    const aktie = await Aktien.findById(aktieId)
+    if (!aktie) {
+      console.error('Aktie does not exist')
+      return next({ status: 404, message: 'Aktie does not exist' })
+    }
+
+    console.log('Tracking: ' + aktie.unternehmen)
+    const newEntry: CurrentDividendRate = {
+      unternehmen: aktie.unternehmen,
+      isin: aktie.isin,
+      wert: 0,
+      dividende: 0,
+      rate: 0,
+    }
+
+    const historisch = await Historisch.findOne({
+      aktieId: aktie.id,
+      //datum: checkDate,
+    })
+      .sort({ datum: 'desc' })
+      .limit(1)
+    if (historisch) {
+      newEntry.wert = historisch.ende
+    } else {
+      console.warn('missing historisch for ' + aktie.unternehmen)
+    }
+
+    const dividenden = await Dividenden.find({ aktieId: aktie.id })
+      .sort({
+        jahr: -1,
+      })
+      .limit(10)
+    if (dividenden.length > 0) {
+      for (const divi of dividenden) {
+        if (divi.wert) {
+          newEntry.dividende += divi.wert
+        }
+      }
+      newEntry.rate = newEntry.dividende / newEntry.wert
+    } else {
+      console.warn('Missing dividends for ' + aktie.unternehmen)
+    }
+
+    res.status(200).json({
+      newEntry,
     })
   } catch (error) {
     serverError(error, next)
