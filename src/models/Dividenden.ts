@@ -11,6 +11,6 @@ const dividendenSchema = new mongoose.Schema({
   jahr: { type: Number, required: true },
 })
 
-const Dividenden = mongoose.model('Dividenden', dividendenSchema)
+const Dividenden = mongoose.model('AktieDividenden', dividendenSchema)
 
 module.exports = Dividenden

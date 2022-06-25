@@ -14,6 +14,6 @@ const historischSchema = new mongoose.Schema({
   volumen: { type: Number, required: true },
 })
 
-const Historisch = mongoose.model('Historisch', historischSchema)
+const Historisch = mongoose.model('AktieHistorisch', historischSchema)
 
 module.exports = Historisch

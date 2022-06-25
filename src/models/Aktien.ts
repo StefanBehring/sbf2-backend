@@ -8,6 +8,7 @@ const aktienSchema = new mongoose.Schema({
   urlHistorisch: { type: String, required: false },
   urlBilanzGuv: { type: String, required: false },
   urlDividende: { type: String, required: false },
+  last_update: { type: String, required: false },
 })
 
 const Aktien = mongoose.model('Aktien', aktienSchema)
