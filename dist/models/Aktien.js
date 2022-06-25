@@ -12,6 +12,7 @@ const aktienSchema = new mongoose_1.default.Schema({
     urlHistorisch: { type: String, required: false },
     urlBilanzGuv: { type: String, required: false },
     urlDividende: { type: String, required: false },
+    last_update: { type: String, required: false },
 });
 const Aktien = mongoose_1.default.model('Aktien', aktienSchema);
 module.exports = Aktien;

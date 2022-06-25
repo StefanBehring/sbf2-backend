@@ -17,5 +17,5 @@ const historischSchema = new mongoose_1.default.Schema({
     tief: { type: Number, required: true },
     volumen: { type: Number, required: true },
 });
-const Historisch = mongoose_1.default.model('Historisch', historischSchema);
+const Historisch = mongoose_1.default.model('AktieHistorisch', historischSchema);
 module.exports = Historisch;

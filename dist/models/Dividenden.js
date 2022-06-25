@@ -14,5 +14,5 @@ const dividendenSchema = new mongoose_1.default.Schema({
     waehrung: { type: String, required: true },
     jahr: { type: Number, required: true },
 });
-const Dividenden = mongoose_1.default.model('Dividenden', dividendenSchema);
+const Dividenden = mongoose_1.default.model('AktieDividenden', dividendenSchema);
 module.exports = Dividenden;
