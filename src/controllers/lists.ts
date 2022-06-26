@@ -18,7 +18,9 @@ type DividendeRise = {
   dividenden: {
     jahr: number
     dividende: number
+    waehrung: string
   }[]
+  currentPrice: number
   isRiser: boolean
 }
 
@@ -76,30 +78,6 @@ export const getCurrentDividendsRate: RequestHandler = async (
         dividende: 0,
         rate: 0,
       }
-      /*
-      let ausgangsdatum = new Date()
-      ausgangsdatum.setDate(ausgangsdatum.getDate() - 1)
-
-      if (ausgangsdatum.getDay() === 0) {
-        ausgangsdatum.setDate(ausgangsdatum.getDate() - 2)
-      } else if (ausgangsdatum.getDay() === 6) {
-        ausgangsdatum.setDate(ausgangsdatum.getDate() - 1)
-      }
-
-      let checkDay: number | string = ausgangsdatum.getDate()
-      let checkMonth: number | string = ausgangsdatum.getMonth() + 1
-      let checkYear = ausgangsdatum.getFullYear()
-      if (checkDay < 10) {
-        checkDay = `0${checkDay}`
-      }
-      if (checkMonth === 12) {
-        checkMonth = '01'
-        checkYear += 1
-      } else if (checkMonth < 10) {
-        checkMonth = `0${checkMonth}`
-      }
-      const checkDate = `${checkDay}.${checkMonth}.${checkYear}`
-      */
 
       const historisch = await Historisch.findOne({
         aktieId: aktie.id,
@@ -215,6 +193,7 @@ export const getConstantDividendRises: RequestHandler = async (
         unternehmen: aktie.unternehmen,
         isin: aktie.isin,
         dividenden: [],
+        currentPrice: 0,
         isRiser: false,
       }
 
@@ -234,6 +213,7 @@ export const getConstantDividendRises: RequestHandler = async (
           return {
             jahr: el.jahr,
             dividende: el.wert,
+            waehrung: el.waehrung,
           }
         })
 
@@ -254,12 +234,21 @@ export const getConstantDividendRises: RequestHandler = async (
       }
 
       if (newEntry.isRiser) {
+        const historisch = await Historisch.find({ aktieId: aktie.id })
+          .sort({ jahr: -1 })
+          .limit(1)
+
+        if (historisch.length > 0) {
+          newEntry.currentPrice = historisch[0].ende
+        }
+
         listData.push(newEntry)
       }
     }
 
     listData.sort(compareRiser)
 
+    res.header('Access-Control-Allow-Origin', '*')
     res.status(200).json({
       listData,
     })
@@ -292,27 +281,9 @@ export const getLast10YearsDividendsRate: RequestHandler = async (
         dividende: 0,
         rate: 0,
       }
-      /*
-      let ausgangsdatum = new Date()
-      ausgangsdatum.setDate(ausgangsdatum.getDate() - 1)
-      let checkDay: number | string = ausgangsdatum.getDate()
-      let checkMonth: number | string = ausgangsdatum.getMonth() + 1
-      let checkYear = ausgangsdatum.getFullYear()
-      if (checkDay < 10) {
-        checkDay = `0${checkDay}`
-      }
-      if (checkMonth === 12) {
-        checkMonth = '01'
-        checkYear += 1
-      } else if (checkMonth < 10) {
-        checkMonth = `0${checkMonth}`
-      }
-      const checkDate = `${checkDay}.${checkMonth}.${checkYear}`
-      */
 
       const historisch = await Historisch.findOne({
         aktieId: aktie.id,
-        //datum: checkDate,
       })
         .sort({ datum: 'desc' })
         .limit(1)
@@ -380,7 +351,6 @@ export const getLast10YearsDividendsRateAktie: RequestHandler = async (
 
     const historisch = await Historisch.findOne({
       aktieId: aktie.id,
-      //datum: checkDate,
     })
       .sort({ datum: 'desc' })
       .limit(1)
