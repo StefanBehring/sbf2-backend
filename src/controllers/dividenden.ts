@@ -12,6 +12,7 @@ export const getDividenden: RequestHandler = async (req, res, next) => {
       return next({ status: 404, message: 'No dividends found' })
     }
 
+    res.header('Access-Control-Allow-Origin', '*')
     res.status(200).json({
       dividenden,
     })
