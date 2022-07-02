@@ -1,5 +1,6 @@
 import { RequestHandler } from 'express'
 import serverError from '../lib/serverError'
+import compareDatumStringDESC from '../lib/compateDatumStringDESC'
 const Aktien = require('../models/Aktien')
 const Dividenden = require('../models/Dividenden')
 const Historisch = require('../models/Historisch')
@@ -235,7 +236,7 @@ export const getConstantDividendRises: RequestHandler = async (
 
       if (newEntry.isRiser) {
         const historisch = await Historisch.find({ aktieId: aktie.id })
-          .sort({ jahr: -1 })
+          .sort({ datum: -1 })
           .limit(1)
 
         if (historisch.length > 0) {
