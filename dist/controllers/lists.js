@@ -180,7 +180,7 @@ const getConstantDividendRises = async (req, res, next) => {
             }
             if (newEntry.isRiser) {
                 const historisch = await Historisch.find({ aktieId: aktie.id })
-                    .sort({ jahr: -1 })
+                    .sort({ datum: -1 })
                     .limit(1);
                 if (historisch.length > 0) {
                     newEntry.currentPrice = historisch[0].ende;

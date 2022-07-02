@@ -14,6 +14,7 @@ const getDividenden = async (req, res, next) => {
             console.error('No dividends found');
             return next({ status: 404, message: 'No dividends found' });
         }
+        res.header('Access-Control-Allow-Origin', '*');
         res.status(200).json({
             dividenden,
         });

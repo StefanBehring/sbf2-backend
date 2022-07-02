@@ -4,6 +4,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getHistorisch = void 0;
+const compareDatumStringASC_1 = __importDefault(require("../lib/compareDatumStringASC"));
 const serverError_1 = __importDefault(require("../lib/serverError"));
 const Historisch = require('../models/Historisch');
 const getHistorisch = async (req, res, next) => {
@@ -14,6 +15,8 @@ const getHistorisch = async (req, res, next) => {
             console.error('No historisch data found');
             return next({ status: 404, message: 'No historisch data found' });
         }
+        historisch.sort((a, b) => (0, compareDatumStringASC_1.default)(a.datum, b.datum));
+        res.header('Access-Control-Allow-Origin', '*');
         res.status(200).json({
             historisch,
         });
