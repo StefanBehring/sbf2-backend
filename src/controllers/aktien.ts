@@ -56,6 +56,7 @@ export const getAktieByIsin: RequestHandler = async (req, res, next) => {
 
     console.log(aktie)
 
+    res.header('Access-Control-Allow-Origin', '*')
     res.status(200).json({
       id: aktie._id,
       unternehmen: aktie.unternehmen,
@@ -64,6 +65,7 @@ export const getAktieByIsin: RequestHandler = async (req, res, next) => {
       urlBilanzGuv: aktie.urlBilanzGuv,
       urlDividende: aktie.urlDividende,
       urlHistorisch: aktie.urlHistorisch,
+      lastUpdate: aktie.lastUpdate,
     })
   } catch (error) {
     serverError(error, next)
